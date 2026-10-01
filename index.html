@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>MYRA - AI Friend</title>
+
+    <style>
+        body {
+            margin: 0;
+            background: linear-gradient(135deg, #0f172a, #2563eb);
+            font-family: Arial;
+            color: white;
+            text-align: center;
+            min-height: 100vh;
+        }
+
+        .app {
+            max-width: 700px;
+            margin: auto;
+            padding: 30px 15px;
+        }
+
+        h1 {
+            font-size: 65px;
+            margin: 10px;
+        }
+
+        .subtitle {
+            font-size: 20px;
+            opacity: 0.8;
+        }
+
+        #chat {
+            background: white;
+            color: black;
+            min-height: 300px;
+            margin-top: 25px;
+            padding: 20px;
+            border-radius: 20px;
+            text-align: left;
+            overflow-y: auto;
+        }
+
+        .myMessage {
+            background: #dbeafe;
+            padding: 12px;
+            border-radius: 12px;
+            margin: 10px 0;
+        }
+
+        .myraMessage {
+            background: #dcfce7;
+            padding: 12px;
+            border-radius: 12px;
+            margin: 10px 0;
+        }
+
+        .controls {
+            margin-top: 15px;
+        }
+
+        input {
+            width: 55%;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 17px;
+        }
+
+        button {
+            padding: 15px 18px;
+            margin: 5px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .mic {
+            background: #ef4444;
+            color: white;
+        }
+
+        .clear {
+            background: #111827;
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="app">
+
+    <h1>MYRA</h1>
+
+    <div class="subtitle">
+        Your AI Friend
+    </div>
+
+    <div id="chat">
+        <div class="myraMessage">
+            <b>MYRA:</b> Hello! Main MYRA hoon.
+        </div>
+    </div>
+
+    <div class="controls">
+
+        <input
+            id="message"
+            type="text"
+            placeholder="MYRA se kuch bolo..."
+        >
+
+        <button onclick="sendMessage()">Send</button>
+
+        <button class="mic" onclick="startListening()">
+            Mic
+        </button>
+
+        <button class="clear" onclick="clearChat()">
+            Clear
+        </button>
+
+    </div>
+
+</div>
+
+<script>
+
+    const myName = "MYRA";
+
+    function sendMessage() {
+
+        let input = document.getElementById("message");
+
+        let message = input.value.trim();
+
+        if (message === "") {
+            return;
+        }
+
+        addMessage("You", message, "myMessage");
+
+        let reply = getReply(message);
+
+        setTimeout(function() {
+
+            addMessage(myName, reply, "myraMessage");
+
+            speak(reply);
+
+        }, 500);
+
+        input.value = "";
+    }
+
+
+    function addMessage(name, message, className) {
+
+        let chat = document.getElementById("chat");
+
+        let div = document.createElement("div");
+
+        div.className = className;
+
+        div.innerHTML =
+            "<b>" + name + ":</b> " + message;
+
+        chat.appendChild(div);
+
+        chat.scrollTop = chat.scrollHeight;
+    }
+
+
+    function getReply(message) {
+
+        let text = message.toLowerCase();
+
+
+        if (
+            text.includes("hello") ||
+            text.includes("hi") ||
+            text.includes("hey")
+        ) {
+            return "Hello! Main MYRA hoon. Kaise ho?";
+        }
+
+
+        if (
+            text.includes("kaise ho") ||
+            text.includes("how are you")
+        ) {
+            return "Main bilkul ready hoon tumse baat karne ke liye.";
+        }
+
+
+        if (
+            text.includes("naam") ||
+            text.includes("name")
+        ) {
+            return "Mera naam MYRA hai.";
+        }
+
+
+        if (text.includes("thank")) {
+            return "You're welcome.";
+        }
+
+
+        if (text.includes("bye")) {
+            return "Bye! Phir milte hain.";
+        }
+
+
+        if (text.includes("love")) {
+            return "Main tumhari AI friend hoon.";
+        }
+
+
+        return "Hmm. Ye interesting hai. Mujhe aur batao.";
+    }
+
+
+    function speak(text) {
+
+        if ("speechSynthesis" in window) {
+
+            let speech =
+                new SpeechSynthesisUtterance(text);
+
+            speech.lang = "en-IN";
+
+            speech.rate = 1;
+
+            speech.pitch = 1;
+
+            window.speechSynthesis.speak(speech);
+        }
+    }
+
+
+    function startListening() {
+
+        const SpeechRecognition =
+            window.SpeechRecognition ||
+            window.webkitSpeechRecognition;
+
+
+        if (!SpeechRecognition) {
+
+            alert(
+                "Is browser me voice recognition support nahi hai."
+            );
+
+            return;
+        }
+
+
+        let recognition =
+            new SpeechRecognition();
+
+
+        recognition.lang = "hi-IN";
+
+        recognition.start();
+
+
+        recognition.onresult = function(event) {
+
+            let text =
+                event.results[0][0].transcript;
+
+            document.getElementById("message").value = text;
+
+            sendMessage();
+        };
+    }
+
+
+    document.getElementById("message")
+        .addEventListener("keydown", function(event) {
+
+            if (event.key === "Enter") {
+
+                sendMessage();
+            }
+
+        });
+
+
+    function clearChat() {
+
+        document.getElementById("chat").innerHTML =
+            '<div class="myraMessage">' +
+            '<b>MYRA:</b> Chat clear ho gaya.' +
+            '</div>';
+    }
+
+</script>
+
+</body>
+</html>
